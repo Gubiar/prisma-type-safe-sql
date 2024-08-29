@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js Prisma TypedSQL Demo
 
-## Getting Started
+This project demonstrates an issue with Prisma's TypedSQL feature in a Next.js application.
 
-First, run the development server:
+## Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js v20.15.1 (i use this version)
+- npm (10.8.3)
+- PostgreSQL database ([neon.tech](neon.tech) Postgre 16)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository:
+   ```
+   git clone https://github.com/Gubiar/prisma-type-safe-sql.git
+   cd prisma-type-safe-sql
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-## Learn More
+3. Set up your environment variables:
+   Create a `.env` file in the root directory and add your database URL:
+   ```
+   DATABASE_URL="postgresql://username:password@localhost:5432/your_database"
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Push the Prisma schema to your database:
+   ```
+   npx prisma db push
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Running the Application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. Start the development server:
+   ```
+   npm run dev
+   ```
 
-## Deploy on Vercel
+2. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Reproducing the Error
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+To reproduce the error with Prisma's TypedSQL feature:
+
+1. Ensure you have a SQL file named `getPosts.sql` in the `prisma/sql/` directory with the following content:
+
+   ```sql
+    SELECT 
+        p.id,
+        p.title,
+        p.author,
+        p.content,
+        p."createDate",
+        s.name AS "statusName"
+    FROM 
+        "Post" p
+    JOIN 
+        "Status" s ON p."statusId" = s.id
+   ```
+
+2. Run the following command:
+   ```
+   npx prisma generate --sql
+   ```
+
+3. You should see the following error:
+   ```
+   Error: Errors while reading sql files:
+   In prisma\sql\getPosts.sql:
+   Error: ERROR: prepared statement "s2" does not exist
+   ```
+
+## Additional Information
+
+- The SQL query works fine when executed directly in the database.
+- The query also works when used with `prisma.$queryRaw`.
+- This issue specifically occurs when trying to use Prisma's TypedSQL feature.
+
+If you encounter this issue or have any insights, please open an issue in this repository or contribute to the discussion on the Prisma GitHub repository.
