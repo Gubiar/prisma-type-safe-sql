@@ -72,6 +72,35 @@ To reproduce the error with Prisma's TypedSQL feature:
    In prisma\sql\getPosts.sql:
    Error: ERROR: prepared statement "s2" does not exist
    ```
+## Troubleshooting (UPDATE [https://github.com/prisma/prisma/discussions/25106#discussioncomment-10500102](https://github.com/prisma/prisma/discussions/25106#discussioncomment-10500102))
+
+If you encounter the "prepared statement "s2" does not exist" error, try the following solution:
+
+1. Add a `DIRECT_URL` to your `.env` file. This is particularly important if you're using a database service like Neon.
+
+   ```
+   DATABASE_URL="your_connection_string_here"
+   DIRECT_URL="your_direct_connection_string_here"
+   ```
+
+   For more information on using a direct connection, especially with Neon, see: [Neon's guide on using Prisma](https://neon.tech/docs/guides/prisma#using-a-direct-connection-to-the-database)
+
+2. Update prisma/schema.prisma
+
+   ```
+   generator client {
+      provider = "prisma-client-js"
+      previewFeatures = ["typedSql"]
+   }
+
+   datasource db {
+      provider  = "postgresql"
+      url  	    = env("DATABASE_URL")
+      directUrl = env("DIRECT_URL")
+   }
+   ```
+
+3. After adding the `DIRECT_URL`, try running `npx prisma generate --sql` again.
 
 ## Additional Information
 

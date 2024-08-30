@@ -1,9 +1,8 @@
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { getPosts } from "@prisma/client/sql"
 
-import { Post as PostProps } from '@prisma/client';
-
-export default function Post({ post }: { post: PostProps }) {
+export default function Post({ post }: { post: getPosts.Result }) {
     return (
         <Card key={post.id}>
         <CardHeader>
@@ -16,8 +15,8 @@ export default function Post({ post }: { post: PostProps }) {
           <p>{post.content}</p>
         </CardContent>
         <CardFooter>
-          <Badge variant={post.statusId === 1 ? "default" : "secondary"} className="uppercase">
-            {post.statusId}
+          <Badge variant={post.statusName === "Active" ? "default" : "secondary"} className="uppercase">
+            {post.statusName}
           </Badge>
         </CardFooter>
       </Card>

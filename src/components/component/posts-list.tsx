@@ -1,26 +1,16 @@
+import { getPosts } from "@prisma/client/sql";
 import Post from "./post"
-import { Post as PostProps, PrismaClient } from "@prisma/client"
+import {PrismaClient } from "@prisma/client"
+import { TypedSql, Result } from "@prisma/client/runtime/library";
 
 export async function PostsList() {
-  let posts: PostProps[] = [];
+  let posts: getPosts.Result[] = []; // Explicitly define the type (consider using a const)
 
   const prisma = new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
   });
 
-  posts = await prisma.$queryRaw`
-    SELECT 
-      p.id,
-      p.title,
-      p.author,
-      p.content,
-      p."createDate",
-      s.name AS "statusName"
-    FROM 
-        "Post" p
-    JOIN 
-        "Status" s ON p."statusId" = s.id
-  `;
+  posts = await prisma.$queryRawTyped(getPosts())
 
   let count = await prisma.$queryRaw`
   SELECT 
